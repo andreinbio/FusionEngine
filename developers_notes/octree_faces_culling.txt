@@ -1,0 +1,26 @@
+//enumeration of cube faces; ex.: face[0] --> face X...
+index 0 --> face X
+index 1 --> negative face x
+index 2 --> face Y
+index 3 --> negative face y
+index 4 --> face Z
+index 5 --> negative face z
+
+//faces with it's own edges
+//face X
+  face[0] = e0.ending, e1.ending, e2.ending, e3.ending
+//face x/negative X
+  face[1] = e0.start, e1.start, e2.start, e3.start
+
+//face Y
+  face[2] = e4.ending, e5.ending, e6.ending, e7.ending
+//face y/negative Y
+  face[3] = e4.start, e5.start, e6.start, e7.start
+
+//face Z
+  face[4] = e8.ending, e9.ending, e10.ending, e11.ending
+//face z/negative Z
+  face[5] = e8.start, e9.start, e10.start, e11.start
+
+//each corner of the face with it's coresponding
+face[0].luc --> 
