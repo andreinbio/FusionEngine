@@ -22,5 +22,18 @@ index 5 --> negative face z
 //face z/negative Z
   face[5] = e8.start, e9.start, e10.start, e11.start
 
-//each corner of the face with it's coresponding
-face[0].luc --> 
+//each corner of the face with it's coresponding 3 edges
+face[0].luc --> e0.ending, e9.ending, e5.ending		face[1].luc --> e1.start, e8.start, e6.ending
+face[0].ruc --> e1.ending, e9.start, e4.ending		face[1].ruc --> e0.start, e8.ending, e7.ending
+face[0].rbc --> e3.ending, e11.start, e4.start		face[1].rbc --> e2.start, e10.ending, e7.start
+face[0].lbc --> e2.ending, e11.ending, e5.start		face[1].lbc --> e3.start, e10.start, e6.start
+
+face[2].luc --> e4.ending, e9.start, e1.ending		face[3].luc --> e5.start, e11.ending, e2.ending
+face[2].ruc --> e5.ending, e9.ending, e0.ending		face[3].ruc --> e4.start, e11.start, e3.ending
+face[2].rbc --> e7.ending, e8.ending, e0.start		face[3].rbc --> e6.start, e10.start, e3.start
+face[2].lbc --> e6.ending, e8.start, e1.start		face[3].lbc --> e7.start, e10.ending, e2.start
+
+face[4].luc --> e8.ending, e0.start, e7.ending		face[5].luc --> e9.start, e1.ending, e4.ending
+face[4].ruc --> e9.ending, e0.ending, e5.ending		face[5].ruc --> e8.start, e1.start, e6.ending
+face[4].rbc --> e11.ending, e2.ending, e5.start		face[5].rbc --> e10.start, e3.start, e6.start
+face[4].lbc --> e10.ending, e2.start, e7.start		face[5].lbc --> e11.start, e3.ending, e4.start
