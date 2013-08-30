@@ -79,7 +79,7 @@ class OctreeManagement: public utils {
     public:
         //editing mode functions
         cube *new_cubes(bool consistency);
-        glm::vec3 findOctreeCenter(glm::vec3 pointer_position, glm::vec3 cube_center, float radius);
+        glm::vec3 find_octree_center(glm::vec3 pointer_position, glm::vec3 cube_center, float radius);
         void updateCubeFace(glm::vec3 position, glm::vec3 direction, GLushort window_width, GLushort window_height, MVPmatrices matrix);
         bool subdivide_cube(cube &c);
         cube *return_selected_cube(unsigned short &child_cube, glm::vec3 cube_location);
@@ -127,18 +127,18 @@ class OctreeManagement: public utils {
 
         //void findMousePointer(glm::vec3 position, glm::vec3 direction);
         void update_level(short mouse_scroll);
-        void setup_octree(GLuint shader);
+        void SetupOctree(GLuint shader);
 
         void generate_buffer_objects();
 
         data_selection generate_cube_vertices(glm::vec3 center, float radius, bool cube_selection);
 
-        void keyG_pressed(bool condition);
-        bool return_keyG(void);
+        void KeyGPressed(bool condition);
+        bool ReturnKeyG();
 
-        void mark_selection();
-        void unmark_selection();
-        bool if_selected();
+        void MarkSelection();
+        void UnmarkSelection();
+        bool IsSelected();
 
         void store_data_to_gpu(data_selection cube_data);
         void Draw(GLuint shader, MVPuniforms unifrom, MVPmatrices matrix);
@@ -159,6 +159,6 @@ class OctreeManagement: public utils {
         void store_data_to_gpu2(vector<vector_data> map_data);
         void Render(GLuint shader, MVPuniforms uniform, MVPmatrices matrix);
 
-        void setup_octree2(GLuint shader);
+        void SetupOctree2(GLuint shader);
 };
 

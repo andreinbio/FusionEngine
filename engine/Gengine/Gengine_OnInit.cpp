@@ -37,9 +37,9 @@ bool Gengine::OnInit() {
  ExitOnGLError("ERROR: Could not create SimpleShader ");
  //MapShader = CreateShaders("Shaders/")
 
- OctreeCube.setup_octree(SimpleShader);
+ OctreeCube.SetupOctree(SimpleShader);
  ExitOnGLError("ERROR: setup_cube_octree ");
- OctreeMap.setup_octree2(SimpleShader);
+ OctreeMap.SetupOctree2(SimpleShader);
  ExitOnGLError("ERROR: setup_map_octree");
  OctreeMap.MapGeneration(OctreeCube.return_worldroot());
 

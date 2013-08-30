@@ -26,14 +26,14 @@ void Gengine::OnEvent(sf::Event & event) {
     case sf::Keyboard::G:
      if(ingame)
      {
-      OctreeCube.keyG_pressed(true);//cerr<<"keyG true "<<OctreeCube.return_keyG()<<endl;
+      OctreeCube.KeyGPressed(true);//cerr<<"keyG true "<<OctreeCube.return_keyG()<<endl;
      }
      break;
 
     case sf::Keyboard::Tab:
      if(ingame)
      {
-      OctreeCube.unmark_selection();
+      OctreeCube.UnmarkSelection();
      }
      break;
    }
@@ -45,7 +45,7 @@ void Gengine::OnEvent(sf::Event & event) {
     case sf::Keyboard::G:
      if(ingame)
      {
-      OctreeCube.keyG_pressed(false);//cerr<<"keyG false "<< OctreeCube.return_keyG()<<endl;
+      OctreeCube.KeyGPressed(false);//cerr<<"keyG false "<< OctreeCube.return_keyG()<<endl;
      }
     break;
 
@@ -56,11 +56,11 @@ void Gengine::OnEvent(sf::Event & event) {
    break;
 
   case sf::Event::MouseWheelMoved:
-   if(ingame && OctreeCube.return_keyG())
+   if(ingame && OctreeCube.ReturnKeyG())
    {//cerr<<"update_level "<<OctreeCube.return_keyG()<<endl;
     OctreeCube.update_level(event.mouseWheel.delta);
    }
-   else if(ingame && OctreeCube.if_selected() && !OctreeCube.return_keyG())
+   else if(ingame && OctreeCube.IsSelected() && !OctreeCube.ReturnKeyG())
    {
     OctreeCube.GenerateOctreeData(event.mouseWheel.delta);
     OctreeMap.MapGeneration(OctreeCube.return_worldroot());
@@ -73,7 +73,7 @@ void Gengine::OnEvent(sf::Event & event) {
     case sf::Mouse::Left:
      if(ingame)
      {
-      OctreeCube.mark_selection();
+      OctreeCube.MarkSelection();
      }
     break;
    }

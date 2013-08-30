@@ -1,7 +1,11 @@
 #include "OctreeManagement.hpp"
 
 // editing mode functions
-
+/*
+=======================
+new_cubes()
+=======================
+*/
 cube *OctreeManagement::new_cubes(bool consistency) {
     cube *c = new cube[8];
     for (unsigned short i = 0; i < 8; i++)
@@ -11,12 +15,15 @@ cube *OctreeManagement::new_cubes(bool consistency) {
         set_all_faces_to_false(c[i]);
         c[i].solid = consistency;
         //more code to follow...
-        //c++;
     }
-    //return c-8;
     return c;
 }
 
+/*
+=======================
+subdivide_cube()
+=======================
+*/
 bool OctreeManagement::subdivide_cube(cube &c) {
     if(c.children) {return true;}
     c.children = new_cubes(c.solid);
@@ -26,6 +33,11 @@ bool OctreeManagement::subdivide_cube(cube &c) {
     return true;
 }
 
+/*
+=======================
+set_edge_spans()
+=======================
+*/
 void OctreeManagement::set_edge_spans(cube &c) {
     for (unsigned short i = 0; i < 12; i++)
     {
@@ -33,6 +45,13 @@ void OctreeManagement::set_edge_spans(cube &c) {
     }
 }
 
+/*
+=======================
+set_all_faces_to_false()
+
+- makes all faces of a cube to be invisible
+=======================
+*/
 void OctreeManagement::set_all_faces_to_false(cube &c) {
     set_cube_face_visibility(c, 0, false);
     set_cube_face_visibility(c, 1, false);
@@ -42,6 +61,14 @@ void OctreeManagement::set_all_faces_to_false(cube &c) {
     set_cube_face_visibility(c, 5, false);
 }
 
+/*
+=======================
+set_octree_face_visibility()
+
+- takes a cube and sets the visibility of its children's faces (recursively) based on the parent's face
+- it's doing this by calling the function set_children_face_visibility() for all 6 faces
+=======================
+*/
 void OctreeManagement::set_octree_face_visibility(cube *c) {
     //verify face 0/positive x of the parent
     set_children_face_visibility(c, 0, 0, 3, 7, 4);
@@ -62,10 +89,25 @@ void OctreeManagement::set_octree_face_visibility(cube *c) {
     set_children_face_visibility(c, 5, 3, 2, 6, 7);
 }
 
+/*
+=======================
+set_cube_face_visibility()
+
+- sets the visibility of one face
+=======================
+*/
 void OctreeManagement::set_cube_face_visibility(cube &c, unsigned short face_index, bool visibility) {
     c.face[face_index].lbc = c.face[face_index].luc = c.face[face_index].rbc = c.face[face_index].ruc = visibility;
 }
 
+/*
+=======================
+set_children_face_visibility()
+
+- sets the visibility of its children's faces for one face
+- it is called in the function set_octree_face_visibility()
+=======================
+*/
 void OctreeManagement::set_children_face_visibility(cube *c, unsigned short face_index, unsigned short luc_cube, unsigned short ruc_cube, unsigned short rbc_cube, unsigned short lbc_cube) {
     if (c->face[face_index].lbc && c->face[face_index].luc ||
         c->face[face_index].lbc && c->face[face_index].rbc ||
@@ -106,6 +148,13 @@ void OctreeManagement::set_children_face_visibility(cube *c, unsigned short face
     }
 }
 
+/*
+=======================
+GenerateOctreeData()
+
+- creates and deletes octrees/cubes
+=======================
+*/
 void OctreeManagement::GenerateOctreeData(short mouse_scroll) {
     unsigned short child_cube;
 
@@ -137,6 +186,7 @@ void OctreeManagement::GenerateOctreeData(short mouse_scroll) {
     }
 }
 
+/*
 void OctreeManagement::function_new_function(cube *c_parent) {
     /////////////////////////////////////////////////////////////
     //verify each corner of cube 0 face[1]
@@ -219,10 +269,15 @@ void OctreeManagement::function_new_function(cube *c_parent) {
         c_parent->children[0].face[1].ruc = false;
     }
     ////////////////////////////////////////////////////////////
-}
+}*/
 
-//verify_sibling_cube/////////////////////////////////////////////////
-//this funsction verifies the given sibling cube against the main cube
+/*
+=======================
+verify_sibling_cube()
+
+- verifies a sibling cube of the main cube for vertices removal
+=======================
+*/
 void OctreeManagement::verify_sibling_cube(cube *c_parent, unsigned short main_cube, unsigned short main_cube_face, unsigned short neighbor_cube, unsigned short neighbor_cube_face, short mouse_scroll) {
     //verify if the cube is solid or not
     if (c_parent->children[neighbor_cube].solid)
@@ -270,6 +325,13 @@ void OctreeManagement::verify_sibling_cube(cube *c_parent, unsigned short main_c
     }
 }
 
+/*
+=======================
+recursively_set_cube_face_visibility()
+
+- sets face visibility of its children recursively
+=======================
+*/
 void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned short face_index, bool visibility) {
     unsigned short luc_cube;
     unsigned short ruc_cube;
@@ -321,7 +383,7 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
             break;
     }
 
-    //verify if one or more of these 4 children has as well children
+    //verify if one or more of these 4 children has children too
     //if it has traverse recursively to it and do the same work as above
     //if it doesn't then set the visibility of the cube face
     if (c.children[luc_cube].children)
@@ -361,6 +423,13 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
     }
 }
 
+/*
+=======================
+verify_cubes_face()
+
+- verifies the faces between main cube and neighbor cube for vertices removal
+=======================
+*/
 void OctreeManagement::verify_cubes_face(cube *neighbor_c, cube *main_c, unsigned short main_cube_face) {
     switch (main_cube_face)
     {
@@ -512,6 +581,13 @@ void OctreeManagement::verify_cubes_face(cube *neighbor_c, cube *main_c, unsigne
     }
 }
 
+/*
+=======================
+verify_corner()
+
+- verifies main and neighbor's cubes corners to see if they are the same or not and sets corner visibility to true/false
+=======================
+*/
 void OctreeManagement::verify_corner(bool &neighbor_corner, bool &main_corner,
                                         unsigned char neighbor_first_edge, unsigned char main_first_edge,
                                         unsigned char neighbor_second_edge, unsigned char main_second_edge,
@@ -532,6 +608,28 @@ void OctreeManagement::verify_corner(bool &neighbor_corner, bool &main_corner,
     }
 }
 
+/*
+=======================
+set_neighbor_face_visibility()
+
+-
+=======================
+*/
+/*
+void OctreeManagement::set_neighbor_face_visibility(cube *neighbor_c, unsigned short main_cube, unsigned short main_cube_face) {
+    switch (main_cube)
+    {
+        ;
+    }
+}*/
+
+/*
+=======================
+verify_neighbor_cube()
+
+- verifies neighobr cube's face for vertices removal
+=======================
+*/
 void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cube_face, unsigned short main_cube, short mouse_scroll) {
     glm::vec3 neighbor_point;
     cube *neighbor_c;
@@ -618,23 +716,13 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
     {
         if (neighbor_c->solid)
         {
-            /*if (!neighbor_c->children)
-            {
-                switch (mouse_scroll)
+            switch (mouse_scroll)
                 {
-                    case 1:
-                        verify_cubes_face(neighbor_c, main_c, main_cube_face, main_cube);
-                        break;
-
                     case -1:
-                        set_cube_face_visibility(*neighbor_c, neighbor_cube_face, true);
+                        //make a new function to...
+                        //set_neighbor_face_visibility();
                         break;
                 }
-            }
-            else
-            {
-                //do something with those children... more code to follow
-            }*/
         }
         else
         {
@@ -648,6 +736,13 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
     }
 }
 
+/*
+=======================
+update_cube_face_visibility()
+
+- updates visibility of cubes faces after an addition or removal of octrees/cubes
+=======================
+*/
 void OctreeManagement::update_cube_face_visibility(cube *c_parent, unsigned short child_cube, short mouse_scroll) {
     switch (child_cube)
     {
@@ -904,6 +999,11 @@ void OctreeManagement::update_cube_face_visibility(cube *c_parent, unsigned shor
     }
 }*/
 
+/*
+=======================
+return_selected_cube()
+=======================
+*/
 cube *OctreeManagement::return_selected_cube(unsigned short &child_cube, glm::vec3 cube_location) {
     //move along the Octree to the pointed cube
     float new_radius = world_radius;
@@ -912,7 +1012,7 @@ cube *OctreeManagement::return_selected_cube(unsigned short &child_cube, glm::ve
     child_cube = find_child_cube(cube_location, new_center);
 
     cube *c = &worldroot->children[child_cube];
-    new_center = findOctreeCenter(cube_location, new_center, new_radius);
+    new_center = find_octree_center(cube_location, new_center, new_radius);
     new_radius = new_radius/2;
 
     for(unsigned short i = 1; i < level; i++)
@@ -921,20 +1021,23 @@ cube *OctreeManagement::return_selected_cube(unsigned short &child_cube, glm::ve
         c_parent = c;
         child_cube = find_child_cube(cube_location, new_center);
         c = &c->children[child_cube];
-        new_center = findOctreeCenter(cube_location, new_center, new_radius);
+        new_center = find_octree_center(cube_location, new_center, new_radius);
         new_radius = new_radius/2;
     }
     return c_parent;
 }
 
-///////////////////////////////////////////////////////////////////
-//return neighbor cube
+/*
+=======================
+return_neighbor_cube()
+=======================
+*/
 cube *OctreeManagement::return_neighbor_cube(unsigned short &i, glm::vec3 cube_location) {
     glm::vec3 center = world_center;
     float radius = world_radius;
 
     cube *c = &worldroot->children[find_child_cube(cube_location, center)];
-    center = findOctreeCenter(cube_location, center, radius);
+    center = find_octree_center(cube_location, center, radius);
     radius = radius/2;
 
     i = 1;
@@ -943,14 +1046,18 @@ cube *OctreeManagement::return_neighbor_cube(unsigned short &i, glm::vec3 cube_l
     {
         i++;
         c = &c->children[find_child_cube(cube_location, center)];
-        center = findOctreeCenter(cube_location, center, radius);
+        center = find_octree_center(cube_location, center, radius);
         radius = radius/2;
     } while (c->children && i < level);
 
     return c;
 }
-///////////////////////////////////////////////////////////////////
 
+/*
+=======================
+delete_children()
+=======================
+*/
 void OctreeManagement::delete_children(cube &c) {
     if (c.children)
     {
@@ -961,6 +1068,11 @@ void OctreeManagement::delete_children(cube &c) {
 
 }
 
+/*
+=======================
+translate_cube_center()
+=======================
+*/
 void OctreeManagement::translate_cube_center(short mouse_scroll) {
     //translate the center of the selected cube along the orientation based on mouse_scroll
     switch (mouse_scroll)
@@ -1047,9 +1159,13 @@ void OctreeManagement::translate_cube_center(short mouse_scroll) {
             }
             break;
     }
-    //end
 }
 
+/*
+=======================
+find_child_cube()
+=======================
+*/
 unsigned short OctreeManagement::find_child_cube(glm::vec3 pointer_position, glm::vec3 center) {
     if(pointer_position.x >= center.x)
     {
@@ -1111,6 +1227,11 @@ unsigned short OctreeManagement::find_child_cube(glm::vec3 pointer_position, glm
     }
 }
 
+/*
+=======================
+generate_octree()
+=======================
+*/
 void OctreeManagement::generate_octree() {
     worldroot = new cube;
     worldroot->children = new_cubes(true);
@@ -1165,10 +1286,20 @@ void OctreeManagement::generate_octree() {
     selected = false;
 }
 
+/*
+=======================
+return_worldroot()
+=======================
+*/
 cube *OctreeManagement::return_worldroot() {
     return worldroot;
 }
 
+/*
+=======================
+ray_octree_intersection()
+=======================
+*/
 glm::vec3 OctreeManagement::ray_octree_intersection(glm::vec3 position, glm::vec3 direction) {
     glm::vec3 center = world_center;
     float radius = world_radius;
@@ -1263,6 +1394,11 @@ glm::vec3 OctreeManagement::ray_octree_intersection(glm::vec3 position, glm::vec
     return inter_point;
 }
 
+/*
+=======================
+process_octree_children()
+=======================
+*/
 bool OctreeManagement::process_octree_children(float t0x, float t0y, float t0z, float t1x, float t1y, float t1z, cube *c, glm::vec3 &inter_point, unsigned char a) {
     bool is_solid;
 
@@ -1377,6 +1513,11 @@ bool OctreeManagement::process_octree_children(float t0x, float t0y, float t0z, 
     return false;
 }
 
+/*
+=======================
+find_first_cube()
+=======================
+*/
 unsigned short OctreeManagement::find_first_cube(float t0x, float t0y, float t0z, float tMx, float tMy, float tMz) {
     unsigned char cube_child = 6;
     if (max(max(t0x, t0y), t0z) == t0x)
@@ -1406,6 +1547,11 @@ unsigned short OctreeManagement::find_first_cube(float t0x, float t0y, float t0z
     return (unsigned short) cube_child;
 }
 
+/*
+=======================
+find_next_cube()
+=======================
+*/
 unsigned short OctreeManagement::find_next_cube(float x, float y, float z, unsigned short a, unsigned short b, unsigned short c) {
     //plane YZ
     if (min(min(x, y), z) == x) return a;
@@ -1420,6 +1566,11 @@ void OctreeManagement::findMousePointer(glm::vec3 position, glm::vec3 direction)
     PointerPosition = position + (2.0f * glm::normalize(direction));
 }*/
 
+/*
+=======================
+update_level()
+=======================
+*/
 void OctreeManagement::update_level(short mouse_scroll) {
     selected = false;
 
@@ -1433,7 +1584,12 @@ void OctreeManagement::update_level(short mouse_scroll) {
     }
 }
 
-glm::vec3 OctreeManagement::findOctreeCenter(glm::vec3 pointer_position, glm::vec3 center, float radius) {
+/*
+=======================
+find_octree_center()
+=======================
+*/
+glm::vec3 OctreeManagement::find_octree_center(glm::vec3 pointer_position, glm::vec3 center, float radius) {
     if(pointer_position.x >= center.x)
     {
         if(pointer_position.y >= center.y)
@@ -1526,6 +1682,11 @@ glm::vec3 OctreeManagement::findOctreeCenter(glm::vec3 pointer_position, glm::ve
     }
 }
 
+/*
+=======================
+updateCubeFace()
+=======================
+*/
 void OctreeManagement::updateCubeFace(glm::vec3 position, glm::vec3 direction, GLushort window_width, GLushort window_height, MVPmatrices matrix) {
     glm::vec3 inter_point;
     inter_point = ray_octree_intersection(position, glm::normalize(direction));
@@ -1534,9 +1695,9 @@ void OctreeManagement::updateCubeFace(glm::vec3 position, glm::vec3 direction, G
     glm::vec3 new_center = world_center;
     data_selection cube_data;
 
-    for(unsigned short i = 0; i < level; i++)
+    for (unsigned short i = 0; i < level; i++)
     {
-        new_center = findOctreeCenter(inter_point, new_center, new_radius);
+        new_center = find_octree_center(inter_point, new_center, new_radius);
         new_radius = new_radius/2;
     }
 
@@ -1550,6 +1711,11 @@ void OctreeManagement::updateCubeFace(glm::vec3 position, glm::vec3 direction, G
     }
 }
 
+/*
+=======================
+generate_buffer_object()
+=======================
+*/
 void OctreeManagement::generate_buffer_objects() {
     glGenVertexArrays(1, &vaoID);
     glGenBuffers(1, &vboVerticesID);
@@ -1572,6 +1738,11 @@ void OctreeManagement::store_data_to_gpu(data_selection cube_data) {
     glBindVertexArray(0);
 }
 
+/*
+=======================
+generate_cube_vertices()
+=======================
+*/
 data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float radius, bool cube_selection) {
 
     data_selection cube_data;
@@ -1600,7 +1771,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         orient = orientation;
     }
 
-    if(orient == 'X')
+    if (orient == 'X')
     {
         front_face[0] = 3;
         front_face[1] = 2;
@@ -1612,7 +1783,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         back_face[2] = 5;
         back_face[3] = 4;
     }
-    else if(orient == 'x')
+    else if (orient == 'x')
     {
         front_face[0] = 0;
         front_face[1] = 1;
@@ -1624,7 +1795,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         back_face[2] = 6;
         back_face[3] = 7;
     }
-    else if(orient == 'Y')
+    else if (orient == 'Y')
     {
         front_face[0] = 1;
         front_face[1] = 2;
@@ -1636,7 +1807,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         back_face[2] = 7;
         back_face[3] = 4;
     }
-    else if(orient == 'y')
+    else if (orient == 'y')
     {
         front_face[0] = 5;
         front_face[1] = 6;
@@ -1648,7 +1819,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         back_face[2] = 3;
         back_face[3] = 0;
     }
-    else if(orient == 'Z')
+    else if (orient == 'Z')
     {
         front_face[0] = 0;
         front_face[1] = 3;
@@ -1660,7 +1831,7 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
         back_face[2] = 6;
         back_face[3] = 5;
     }
-    else if(orient == 'z')
+    else if (orient == 'z')
     {
         front_face[0] = 1;
         front_face[1] = 2;
@@ -1701,35 +1872,69 @@ data_selection OctreeManagement::generate_cube_vertices(glm::vec3 center, float 
     return cube_data;
 }
 
-void OctreeManagement::keyG_pressed(bool condition) {
+/*
+=======================
+KeyGPressed()
+=======================
+*/
+void OctreeManagement::KeyGPressed(bool condition) {
     keyG = condition;
 }
 
-bool OctreeManagement::return_keyG(void) {
+/*
+=======================
+ReturnKeyG()
+=======================
+*/
+bool OctreeManagement::ReturnKeyG() {
     return keyG;
 }
 
-void OctreeManagement::mark_selection() {
+/*
+=======================
+MarkSelection()
+=======================
+*/
+void OctreeManagement::MarkSelection() {
     on_click = true;
     selected = true;
-    //cerr<<"clicked the mouse !!!"<<endl;
 }
 
-void OctreeManagement::unmark_selection() {
+/*
+=======================
+UnmarkSelection()
+=======================
+*/
+void OctreeManagement::UnmarkSelection() {
     selected = false;
 }
 
-bool OctreeManagement::if_selected() {
+/*
+=======================
+IsSelected()
+=======================
+*/
+bool OctreeManagement::IsSelected() {
     return selected;
 }
 
-void OctreeManagement::setup_octree(GLuint shader) {
+/*
+=======================
+SetupOctree()
+=======================
+*/
+void OctreeManagement::SetupOctree(GLuint shader) {
     uniform_color = glGetUniformLocation(shader, "color");
     generate_octree();
     generate_buffer_objects();
     ExitOnGLError("ERROR: generate_buffer_objects ! ");
 }
 
+/*
+=======================
+Draw()
+=======================
+*/
 void OctreeManagement::Draw(GLuint shader, MVPuniforms uniform, MVPmatrices matrix) {
     render_selection_cubes(shader, uniform, matrix);
     if(selected)
@@ -1739,6 +1944,11 @@ void OctreeManagement::Draw(GLuint shader, MVPuniforms uniform, MVPmatrices matr
     }
 }
 
+/*
+=======================
+render_selection_cubes()
+=======================
+*/
 void OctreeManagement::render_selection_cubes(GLuint shader, MVPuniforms uniform, MVPmatrices matrix) {
 
     glUseProgram(shader);
@@ -1777,9 +1987,13 @@ void OctreeManagement::render_selection_cubes(GLuint shader, MVPuniforms uniform
     glUseProgram(0);
 }
 
-//render map functions////////////////////////////////
-//////////////////////////////////////////////////////
+//render map functions
 
+/*
+=======================
+MapGeneration()
+=======================
+*/
 void OctreeManagement::MapGeneration(cube *map_data) {
     world_center = glm::vec3(512.0f, 512.0f, 512.0f);
     world_radius = 512.0f;
@@ -1796,6 +2010,11 @@ void OctreeManagement::MapGeneration(cube *map_data) {
 
 }
 
+/*
+=======================
+traverse_octree_data()
+=======================
+*/
 void OctreeManagement::traverse_octree_data(cube *octree_data, glm::vec3 center, float radius, vector<vector_data> &map_data_vertices) {
     for (unsigned short i = 0; i < 8; i++)
     {
@@ -1822,6 +2041,11 @@ void OctreeManagement::traverse_octree_data(cube *octree_data, glm::vec3 center,
     }
 }
 
+/*
+=======================
+generate_cube_final_vertices()
+=======================
+*/
 cube_vertices OctreeManagement::generate_cube_final_vertices(cube *c, glm::vec3 center, float radius) {
 
  cube_vertices Vert = calculate_cube_vertices(center, radius);
@@ -1950,6 +2174,11 @@ cube_vertices OctreeManagement::generate_cube_final_vertices(cube *c, glm::vec3 
   return Vert;
 }
 
+/*
+=======================
+generate_cube_face()
+=======================
+*/
 void OctreeManagement::generate_cube_face(vector_data &CubeFaces, cube_vertices Vert, cube *c, unsigned short face_index, unsigned short luc_vertex, unsigned short lbc_vertex, unsigned short ruc_vertex, unsigned short rbc_vertex) {
     if (c->face[face_index].lbc && c->face[face_index].luc ||
         c->face[face_index].lbc && c->face[face_index].rbc ||
@@ -1996,6 +2225,11 @@ void OctreeManagement::generate_cube_face(vector_data &CubeFaces, cube_vertices 
     }
 }
 
+/*
+=======================
+create_vector_map()
+=======================
+*/
 void OctreeManagement::create_vector_map(cube_vertices Vert, vector<vector_data> &map_data_vertices, cube *c) {
 
     vector_data CubeFaces;
@@ -2122,6 +2356,11 @@ void OctreeManagement::create_vector_map(cube_vertices Vert, vector<vector_data>
     map_data_vertices.push_back(CubeFaces);
 }
 
+/*
+=======================
+calculate_axis()
+=======================
+*/
 float OctreeManagement::calculate_axis(char axis, double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
     float float_value;
     if (axis == 'x')
@@ -2136,128 +2375,157 @@ float OctreeManagement::calculate_axis(char axis, double x1, double y1, double x
     return float_value;
 }
 
+/*
+=======================
+calculate_cube_vertices()
+=======================
+*/
 cube_vertices OctreeManagement::calculate_cube_vertices(glm::vec3 center, float radius) {
 
- cube_vertices Vert;
+    cube_vertices Vert;
 
- Vert.vertices[6] = glm::vec3(center.x - radius, center.y - radius, center.z - radius);
- Vert.vertices[0] = glm::vec3(center.x + radius, center.y + radius, center.z + radius);
+    Vert.vertices[6] = glm::vec3(center.x - radius, center.y - radius, center.z - radius);
+    Vert.vertices[0] = glm::vec3(center.x + radius, center.y + radius, center.z + radius);
 
- Vert.vertices[1] = glm::vec3(Vert.vertices[6].x, Vert.vertices[0].y, Vert.vertices[0].z);
- Vert.vertices[2] = glm::vec3(Vert.vertices[6].x, Vert.vertices[0].y, Vert.vertices[6].z);
- Vert.vertices[3] = glm::vec3(Vert.vertices[0].x, Vert.vertices[0].y, Vert.vertices[6].z);
- Vert.vertices[4] = glm::vec3(Vert.vertices[0].x, Vert.vertices[6].y, Vert.vertices[0].z);
- Vert.vertices[5] = glm::vec3(Vert.vertices[6].x, Vert.vertices[6].y, Vert.vertices[0].z);
- Vert.vertices[7] = glm::vec3(Vert.vertices[0].x, Vert.vertices[6].y, Vert.vertices[6].z);
+    Vert.vertices[1] = glm::vec3(Vert.vertices[6].x, Vert.vertices[0].y, Vert.vertices[0].z);
+    Vert.vertices[2] = glm::vec3(Vert.vertices[6].x, Vert.vertices[0].y, Vert.vertices[6].z);
+    Vert.vertices[3] = glm::vec3(Vert.vertices[0].x, Vert.vertices[0].y, Vert.vertices[6].z);
+    Vert.vertices[4] = glm::vec3(Vert.vertices[0].x, Vert.vertices[6].y, Vert.vertices[0].z);
+    Vert.vertices[5] = glm::vec3(Vert.vertices[6].x, Vert.vertices[6].y, Vert.vertices[0].z);
+    Vert.vertices[7] = glm::vec3(Vert.vertices[0].x, Vert.vertices[6].y, Vert.vertices[6].z);
 
- return Vert;
+    return Vert;
 }
 
+/*
+=======================
+calculate_octree_center()
+=======================
+*/
 glm::vec3 OctreeManagement::calculate_octree_center(glm::vec3 center, float radius, unsigned short i) {
- glm::vec3 new_center;
- switch (i)
- {
-  case 0:
-   new_center.x = center.x + radius/2;
-   new_center.y = center.y + radius/2;
-   new_center.z = center.z + radius/2;
-   break;
+    glm::vec3 new_center;
+    switch (i)
+    {
+        case 0:
+            new_center.x = center.x + radius/2;
+            new_center.y = center.y + radius/2;
+            new_center.z = center.z + radius/2;
+            break;
 
-  case 1:
-   new_center.x = center.x - radius/2;
-   new_center.y = center.y + radius/2;
-   new_center.z = center.z + radius/2;
-   break;
+        case 1:
+            new_center.x = center.x - radius/2;
+            new_center.y = center.y + radius/2;
+            new_center.z = center.z + radius/2;
+            break;
 
-  case 2:
-   new_center.x = center.x - radius/2;
-   new_center.y = center.y + radius/2;
-   new_center.z = center.z - radius/2;
-   break;
+        case 2:
+            new_center.x = center.x - radius/2;
+            new_center.y = center.y + radius/2;
+            new_center.z = center.z - radius/2;
+            break;
 
-  case 3:
-   new_center.x = center.x + radius/2;
-   new_center.y = center.y + radius/2;
-   new_center.z = center.z - radius/2;
-   break;
+        case 3:
+            new_center.x = center.x + radius/2;
+            new_center.y = center.y + radius/2;
+            new_center.z = center.z - radius/2;
+            break;
 
-  case 4:
-   new_center.x = center.x + radius/2;
-   new_center.y = center.y - radius/2;
-   new_center.z = center.z + radius/2;
-   break;
+        case 4:
+            new_center.x = center.x + radius/2;
+            new_center.y = center.y - radius/2;
+            new_center.z = center.z + radius/2;
+            break;
 
-  case 5:
-   new_center.x = center.x - radius/2;
-   new_center.y = center.y - radius/2;
-   new_center.z = center.z + radius/2;
-   break;
+        case 5:
+            new_center.x = center.x - radius/2;
+            new_center.y = center.y - radius/2;
+            new_center.z = center.z + radius/2;
+            break;
 
-  case 6:
-   new_center.x = center.x - radius/2;
-   new_center.y = center.y - radius/2;
-   new_center.z = center.z - radius/2;
-   break;
+        case 6:
+            new_center.x = center.x - radius/2;
+            new_center.y = center.y - radius/2;
+            new_center.z = center.z - radius/2;
+            break;
 
-  case 7:
-   new_center.x = center.x + radius/2;
-   new_center.y = center.y - radius/2;
-   new_center.z = center.z - radius/2;
-   break;
- }
-  return new_center;
+        case 7:
+            new_center.x = center.x + radius/2;
+            new_center.y = center.y - radius/2;
+            new_center.z = center.z - radius/2;
+            break;
+    }
+    return new_center;
 }
 
+/*
+=======================
+generate_buffer_object2()
+=======================
+*/
 void OctreeManagement::generate_buffer_objects2() {
- glGenVertexArrays(1, &vaoID);
- glGenBuffers(1, &vboVerticesID);
- //glGenBuffers(1, &iboVerticesID);
+    glGenVertexArrays(1, &vaoID);
+    glGenBuffers(1, &vboVerticesID);
+    //glGenBuffers(1, &iboVerticesID);
 }
 
+/*
+=======================
+store_data_to_gpu2()
+=======================
+*/
 void OctreeManagement::store_data_to_gpu2(vector<vector_data> map_data) {
- glBindVertexArray(vaoID);
-  glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-  glBufferData(GL_ARRAY_BUFFER, map_data.size() * sizeof(map_data[0]), &map_data[0], GL_STATIC_DRAW);
-  ExitOnGLError("ERROR: Could not create --map_vertices-- BufferData");
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  ExitOnGLError("ERROR: glVertexAttribArray() --vsVertex-- FAILED");
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboVerticesID);
-  //ExitOnGLError("ERROR: glBindBuffer() --iboVertex-- FAILED");
-  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_data.elements), cube_data.elements, GL_STATIC_DRAW);
-  //ExitOnGLError("ERROR: glBufferData() --iboVertex-- FAILED");
+    glBindVertexArray(vaoID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
+        glBufferData(GL_ARRAY_BUFFER, map_data.size() * sizeof(map_data[0]), &map_data[0], GL_STATIC_DRAW);
+        ExitOnGLError("ERROR: Could not create --map_vertices-- BufferData");
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        ExitOnGLError("ERROR: glVertexAttribArray() --vsVertex-- FAILED");
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboVerticesID);
+        //ExitOnGLError("ERROR: glBindBuffer() --iboVertex-- FAILED");
+        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_data.elements), cube_data.elements, GL_STATIC_DRAW);
+        //ExitOnGLError("ERROR: glBufferData() --iboVertex-- FAILED");
 
- glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
+/*
+=======================
+Render()
+=======================
+*/
 void OctreeManagement::Render(GLuint shader, MVPuniforms uniform, MVPmatrices matrix) {
 
- glUseProgram(shader);
- ExitOnGLError("ERROR: glUseProgram ");
- glUniformMatrix4fv(uniform.Proj, 1, GL_FALSE, glm::value_ptr(matrix.Projection));
- ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.Proj) ");
- glUniformMatrix4fv(uniform.View, 1, GL_FALSE, glm::value_ptr(matrix.View));
- ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.View) ");
- glUniformMatrix4fv(uniform.Model, 1, GL_FALSE, glm::value_ptr(matrix.Model));
- ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.Model) ");
+    glUseProgram(shader);
+    ExitOnGLError("ERROR: glUseProgram ");
+    glUniformMatrix4fv(uniform.Proj, 1, GL_FALSE, glm::value_ptr(matrix.Projection));
+    ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.Proj) ");
+    glUniformMatrix4fv(uniform.View, 1, GL_FALSE, glm::value_ptr(matrix.View));
+    ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.View) ");
+    glUniformMatrix4fv(uniform.Model, 1, GL_FALSE, glm::value_ptr(matrix.Model));
+    ExitOnGLError("ERROR: glUniformMatrix4fv(uniform.Model) ");
 
+    glBindVertexArray(vaoID);
+    ExitOnGLError("ERROR: vaoID ");
 
- glBindVertexArray(vaoID);
- ExitOnGLError("ERROR: vaoID ");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        GLfloat color[4] = {1.0, 0.0, 0.0, 1.0};
+        glUniform4fv(uniform_color, 1, color);
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  GLfloat color[4] = {1.0, 0.0, 0.0, 1.0};
-  glUniform4fv(uniform_color, 1, color);
+        glDrawArrays(GL_TRIANGLES, 0, nr_vertices);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  glDrawArrays(GL_TRIANGLES, 0, nr_vertices);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glBindVertexArray(0);
 
- glBindVertexArray(0);
-
- glUseProgram(0);
+    glUseProgram(0);
 }
 
-void OctreeManagement::setup_octree2(GLuint shader) {
+/*
+=======================
+SetupOctree2()
+=======================
+*/
+void OctreeManagement::SetupOctree2(GLuint shader) {
  uniform_color = glGetUniformLocation(shader, "color");
  generate_buffer_objects2();
  ExitOnGLError("ERROR: generate_buffer_objects ! ");
