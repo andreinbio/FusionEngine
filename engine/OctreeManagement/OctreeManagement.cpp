@@ -28,7 +28,7 @@ bool OctreeManagement::subdivide_cube(cube &c) {
     if(c.children) {return true;}
     c.children = new_cubes(c.solid);
     //set visible faces for all children based on their parent
-    set_octree_face_visibility(&c);
+    //set_octree_face_visibility(&c);
 
     return true;
 }
@@ -718,9 +718,16 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
         {
             switch (mouse_scroll)
                 {
+                    case 1:
+                        //make a new function to...
+                        //set_neighbor_face_visibility();
+                        neighbor_c->face[neighbor_cube_face].luc = false;
+                        break;
+
                     case -1:
                         //make a new function to...
                         //set_neighbor_face_visibility();
+                        neighbor_c->face[neighbor_cube_face].luc = true;
                         break;
                 }
         }
