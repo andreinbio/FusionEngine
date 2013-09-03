@@ -60,10 +60,9 @@ class OctreeManagement: public utils {
 
         char orientation;
         char selection_orientation;
-        //float cube_radius;
-        //glm::vec3 cube_center;
 
-        //glm::vec3 PointerPosition;
+        unsigned short last_corner;
+
         data_selection cube_selection;
 
         bool keyG;
@@ -83,7 +82,8 @@ class OctreeManagement: public utils {
         void updateCubeFace(glm::vec3 position, glm::vec3 direction, GLushort window_width, GLushort window_height, MVPmatrices matrix);
         bool subdivide_cube(cube &c);
         cube *return_selected_cube(unsigned short &child_cube, glm::vec3 cube_location);
-        cube *return_neighbor_cube(unsigned short &i, glm::vec3 cube_location);
+        cube *return_neighbor_cube(unsigned short &i, unsigned short &corner, unsigned short face, glm::vec3 cube_location);
+        unsigned short return_corner(unsigned short face, glm::vec3 point, glm::vec3 center);
         void delete_children(cube &c);
         void set_edge_spans(cube &c);
         void set_all_faces_to_false(cube &c);
@@ -105,12 +105,12 @@ class OctreeManagement: public utils {
         //void calculate_orientation(glm::vec3 point, glm::vec3 center, float radius);
         //bool is_octree_parent_solid(cube *octree_data, glm::vec3 center, float radius);
 
-        //testing function
-        void function_new_function(cube *c_parent);
+        //void function_new_function(cube *c_parent);
 
         void verify_sibling_cube(cube *c_parent, unsigned short main_cube, unsigned short main_cube_face, unsigned short neighbor_cube, unsigned short neighbor_cube_face, short mouse_scroll);
         void verify_neighbor_cube(cube *main_c, unsigned short main_cube_face, unsigned short main_cube, short mouse_scroll);
 
+        void set_neighbor_face_visibility(cube *neighbor_c, unsigned short corner, unsigned short neighbor_cube_face, bool visibility);
         void verify_corner(bool &neighbor_corner, bool &main_corner,
                                         unsigned char neighbor_first_edge, unsigned char main_first_edge,
                                         unsigned char neighbor_second_edge, unsigned char main_second_edge,

@@ -25,7 +25,7 @@ subdivide_cube()
 =======================
 */
 bool OctreeManagement::subdivide_cube(cube &c) {
-    if(c.children) {return true;}
+    if (c.children) {return true;}
     c.children = new_cubes(c.solid);
     //set visible faces for all children based on their parent
     //set_octree_face_visibility(&c);
@@ -390,7 +390,7 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
     {
         recursively_set_cube_face_visibility(c.children[luc_cube], face_index, visibility);
     }
-    else
+    else if (c.children[luc_cube].solid)
     {
         set_cube_face_visibility(c.children[luc_cube], face_index, visibility);
     }
@@ -399,7 +399,7 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
     {
         recursively_set_cube_face_visibility(c.children[ruc_cube], face_index, visibility);
     }
-    else
+    else if (c.children[ruc_cube].solid)
     {
         set_cube_face_visibility(c.children[ruc_cube], face_index, visibility);
     }
@@ -408,7 +408,7 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
     {
         recursively_set_cube_face_visibility(c.children[rbc_cube], face_index, visibility);
     }
-    else
+    else if (c.children[rbc_cube].solid)
     {
         set_cube_face_visibility(c.children[rbc_cube], face_index, visibility);
     }
@@ -417,7 +417,7 @@ void OctreeManagement::recursively_set_cube_face_visibility(cube &c, unsigned sh
     {
         recursively_set_cube_face_visibility(c.children[lbc_cube], face_index, visibility);
     }
-    else
+    else if (c.children[lbc_cube].solid)
     {
         set_cube_face_visibility(c.children[lbc_cube], face_index, visibility);
     }
@@ -612,16 +612,35 @@ void OctreeManagement::verify_corner(bool &neighbor_corner, bool &main_corner,
 =======================
 set_neighbor_face_visibility()
 
--
+-...
 =======================
 */
-/*
-void OctreeManagement::set_neighbor_face_visibility(cube *neighbor_c, unsigned short main_cube, unsigned short main_cube_face) {
-    switch (main_cube)
+
+void OctreeManagement::set_neighbor_face_visibility(cube *neighbor_c, unsigned short corner, unsigned short neighbor_cube_face, bool visibility) {
+    //make an if (visibility) and a backup_corner...
+    switch (corner)
     {
-        ;
+        //luc
+        case 0:
+            neighbor_c->face[neighbor_cube_face].luc = visibility;
+            break;
+
+        //ruc
+        case 1:
+            neighbor_c->face[neighbor_cube_face].ruc = visibility;
+            break;
+
+        //rbc
+        case 2:
+            neighbor_c->face[neighbor_cube_face].rbc = visibility;
+            break;
+
+        //lbc
+        case 3:
+            neighbor_c->face[neighbor_cube_face].lbc = visibility;
+            break;
     }
-}*/
+}
 
 /*
 =======================
@@ -635,6 +654,7 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
     cube *neighbor_c;
     unsigned short neighbor_cube_face;
     unsigned short i;
+    unsigned short corner;
 
     neighbor_point = cube_selection.center;
 
@@ -677,7 +697,7 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
             break;
     }
 
-    neighbor_c = return_neighbor_cube(i, neighbor_point);
+    neighbor_c = return_neighbor_cube(i, corner, neighbor_cube_face, neighbor_point);
 
 
     if (i == level)
@@ -717,19 +737,24 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
         if (neighbor_c->solid)
         {
             switch (mouse_scroll)
-                {
-                    case 1:
-                        //make a new function to...
-                        //set_neighbor_face_visibility();
-                        neighbor_c->face[neighbor_cube_face].luc = false;
-                        break;
+            {
+                case 1:
+                    //make a new function to...
+                    //if (last_corner != corner)
+                    //{
+                        set_neighbor_face_visibility(neighbor_c, corner, neighbor_cube_face, false);
+                    //}
+                    //set_neighbor_face_visibility(neighbor_c, corner, neighbor_cube_face, false);
+                    //neighbor_c->face[neighbor_cube_face].luc = false;
+                    break;
 
-                    case -1:
-                        //make a new function to...
-                        //set_neighbor_face_visibility();
-                        neighbor_c->face[neighbor_cube_face].luc = true;
-                        break;
-                }
+                case -1:
+                    //make a new function to...
+                    set_neighbor_face_visibility(neighbor_c, corner, neighbor_cube_face, true);
+                    //neighbor_c->face[neighbor_cube_face].luc = true;
+                    break;
+            }
+            last_corner = corner;
         }
         else
         {
@@ -900,113 +925,6 @@ void OctreeManagement::update_cube_face_visibility(cube *c_parent, unsigned shor
 }
 
 /*
-void OctreeManagement::update_cube_face_visibility(cube *c_parent, unsigned short child_cube, short mouse_scroll) {
-    glm::vec3 neighbor_point;
-    cube *neighbor_cube;
-    unsigned short i;
-
-    switch (mouse_scroll)
-    {
-        case 1:
-            switch (child_cube)
-            {
-                case 0:
-                    //face X
-                    //find neighbor cube
-                    neighbor_point = cube_selection.center;
-                    neighbor_point.x = cube_selection.center.x + cube_selection.radius + 0.06;
-                    neighbor_cube = return_neighbor_cube(i, neighbor_point);
-
-                    if (neighbor_cube->solid)
-                    {
-                        ;
-                    }
-
-                    //testing new functions
-                    verify_sibling_cube(c_parent, 1, 0, 0, 1, mouse_scroll);
-
-                    break;
-
-                case 1:
-
-                    break;
-
-                case 2:
-
-                    break;
-
-                case 3:
-
-                    break;
-
-                case 4:
-
-                    break;
-
-                case 5:
-
-                    break;
-
-                case 6:
-
-                    break;
-
-                case 7:
-
-                    break;
-            }
-            break;
-
-        case -1:
-            switch (child_cube)
-            {
-                case 0:
-                    //face X
-                    // find neighbor cube
-                    neighbor_point = cube_selection.center;
-                    neighbor_point.x = cube_selection.center.x + cube_selection.radius + 0.06;
-                    neighbor_cube = return_neighbor_cube(i, neighbor_point);
-
-                    if (neighbor_cube->solid)
-                    {
-                        ;
-                    }
-
-                    break;
-
-                case 1:
-
-                    break;
-
-                case 2:
-
-                    break;
-
-                case 3:
-
-                    break;
-
-                case 4:
-
-                    break;
-
-                case 5:
-
-                    break;
-
-                case 6:
-
-                    break;
-
-                case 7:
-
-                    break;
-            }
-            break;
-    }
-}*/
-
-/*
 =======================
 return_selected_cube()
 =======================
@@ -1039,7 +957,7 @@ cube *OctreeManagement::return_selected_cube(unsigned short &child_cube, glm::ve
 return_neighbor_cube()
 =======================
 */
-cube *OctreeManagement::return_neighbor_cube(unsigned short &i, glm::vec3 cube_location) {
+cube *OctreeManagement::return_neighbor_cube(unsigned short &i, unsigned short &corner, unsigned short face, glm::vec3 cube_location) {
     glm::vec3 center = world_center;
     float radius = world_radius;
 
@@ -1057,7 +975,195 @@ cube *OctreeManagement::return_neighbor_cube(unsigned short &i, glm::vec3 cube_l
         radius = radius/2;
     } while (c->children && i < level);
 
+    corner = return_corner(face, cube_location, center);
+
     return c;
+}
+
+/*
+=======================
+return_corner()
+=======================
+*/
+unsigned short OctreeManagement::return_corner(unsigned short face, glm::vec3 point, glm::vec3 center) {
+    unsigned short corner;
+    switch (face)
+    {
+        case 0:
+            if (point.y > center.y)
+            {
+                if (point.z > center.z)
+                {
+                    //luc
+                    corner = 0;
+                }
+                else
+                {
+                    //ruc
+                    corner = 1;
+                }
+            }
+            else
+            {
+                if (point.z > center.z)
+                {
+                    //lbc
+                    corner = 3;
+                }
+                else
+                {
+                    //rbc
+                    corner = 2;
+                }
+            }
+            break;
+
+        case 1:
+            if (point.y > center.y)
+            {
+                if (point.z > center.z)
+                {
+                    //ruc
+                    corner = 1;
+                }
+                else
+                {
+                    //luc
+                    corner = 0;
+                }
+            }
+            else
+            {
+                if (point.z > center.z)
+                {
+                    //rbc
+                    corner = 2;
+                }
+                else
+                {
+                    //lbc
+                    corner = 3;
+                }
+            }
+            break;
+
+        case 2:
+            if (point.x > center.x)
+            {
+                if (point.z > center.z)
+                {
+                    //ruc
+                    corner = 1;
+                }
+                else
+                {
+                    //luc
+                    corner = 0;
+                }
+            }
+            else
+            {
+                if (point.z > center.z)
+                {
+                    //rbc
+                    corner = 2;
+                }
+                else
+                {
+                    //lbc
+                    corner = 3;
+                }
+            }
+            break;
+
+        case 3:
+            if (point.x > center.x)
+            {
+                if (point.z > center.z)
+                {
+                    //luc
+                    corner = 0;
+                }
+                else
+                {
+                    //ruc
+                    corner = 1;
+                }
+            }
+            else
+            {
+                if (point.z > center.z)
+                {
+                    //lbc
+                    corner = 3;
+                }
+                else
+                {
+                    //rbc
+                    corner = 2;
+                }
+            }
+            break;
+
+        case 4:
+            if (point.y > center.y)
+            {
+                if (point.x > center.x)
+                {
+                    //ruc
+                    corner = 1;
+                }
+                else
+                {
+                    //luc
+                    corner = 0;
+                }
+            }
+            else
+            {
+                if (point.x > center.x)
+                {
+                    //rbc
+                    corner = 2;
+                }
+                else
+                {
+                    //lbc
+                    corner = 3;
+                }
+            }
+            break;
+
+        case 5:
+            if (point.y > center.y)
+            {
+                if (point.x > center.x)
+                {
+                    //luc
+                    corner = 0;
+                }
+                else
+                {
+                    //ruc
+                    corner = 1;
+                }
+            }
+            else
+            {
+                if (point.x > center.x)
+                {
+                    //lbc
+                    corner = 3;
+                }
+                else
+                {
+                    //rbc
+                    corner = 2;
+                }
+            }
+            break;
+    }
+    return corner;
 }
 
 /*
@@ -2184,6 +2290,8 @@ cube_vertices OctreeManagement::generate_cube_final_vertices(cube *c, glm::vec3 
 /*
 =======================
 generate_cube_face()
+
+- maybe it needs some modification (luc, lbc, ruc, rbc ---> luc, ruc, rbc, lbc) to be consistent with other code...
 =======================
 */
 void OctreeManagement::generate_cube_face(vector_data &CubeFaces, cube_vertices Vert, cube *c, unsigned short face_index, unsigned short luc_vertex, unsigned short lbc_vertex, unsigned short ruc_vertex, unsigned short rbc_vertex) {
@@ -2351,9 +2459,11 @@ void OctreeManagement::create_vector_map(cube_vertices Vert, vector<vector_data>
     //face -x
     generate_cube_face(CubeFaces, Vert, c, 1, 2, 6, 1, 5);
     //face y
-    generate_cube_face(CubeFaces, Vert, c, 2, 2, 1, 3, 0);
+    //generate_cube_face(CubeFaces, Vert, c, 2, 2, 1, 3, 0);
+    generate_cube_face(CubeFaces, Vert, c, 2, 3, 2, 0, 1);
     //face -y
-    generate_cube_face(CubeFaces, Vert, c, 3, 5, 6, 4, 7);
+    //generate_cube_face(CubeFaces, Vert, c, 3, 5, 6, 4, 7);
+    generate_cube_face(CubeFaces, Vert, c, 3, 4, 5, 7, 6);
     //face z
     generate_cube_face(CubeFaces, Vert, c, 4, 1, 5, 0, 4);
     //face -z
