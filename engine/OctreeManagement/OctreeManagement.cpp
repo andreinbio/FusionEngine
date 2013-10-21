@@ -318,7 +318,7 @@ void OctreeManagement::verify_sibling_cube(cube *c_parent, unsigned short main_c
         switch (mouse_scroll)
             {
                 case 1:
-                    //if it has no children then...verify adjacent face of the main cube and the neighbor cube
+                    //...
                     set_cube_face_visibility(c_parent->children[main_cube], main_cube_face, true);
                     break;
             }
@@ -700,6 +700,7 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
     neighbor_c = return_neighbor_cube(i, corner, neighbor_cube_face, neighbor_point);
 
 
+    //if main cube and neighbour cube are the same size
     if (i == level)
     {
         if (neighbor_c->solid)
@@ -732,7 +733,8 @@ void OctreeManagement::verify_neighbor_cube(cube *main_c, unsigned short main_cu
             }
         }
     }
-    else// i < level
+    // i < level / the neighbour cube is bigger then the main cube
+    else
     {
         if (neighbor_c->solid)
         {
@@ -943,6 +945,7 @@ cube *OctreeManagement::return_selected_cube(unsigned short &child_cube, glm::ve
     for(unsigned short i = 1; i < level; i++)
     {
         subdivide_cube(*c);
+        set_octree_face_visibility(c);
         c_parent = c;
         child_cube = find_child_cube(cube_location, new_center);
         c = &c->children[child_cube];
